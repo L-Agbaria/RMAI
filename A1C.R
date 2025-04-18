@@ -15,8 +15,11 @@ modified_round <- function(value) {
 }
 
 generate_data <- function(sample_size){
+  # Take a sample from a truncated normal distribution for explanatory variable
   x_grade_stats <<- rtruncnorm(sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
+  # Generate the random noise from a truncated normal distribution
   random_noise = rtruncnorm(sample_size, a=-7, b=7, mean=0, sd=2)
+  # Generate discrete data
   y_performance <<- round(7 + 0 * x_grade_stats + random_noise, digits=0)
 }
 
