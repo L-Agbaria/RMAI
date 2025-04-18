@@ -14,12 +14,15 @@ modified_round <- function(value) {
   }
 }
 
+################################################################################
+
 # PART B
 sample_size = 237
 # Number of times to repeat the experiment
 tests_num = 50000
-# P values extracted from each repetition of the experiment 
+# P values extracted from each repetition of the experiment
 p_values = numeric(tests_num) 
+rounded_p_values = numeric(tests_num)
 # Creates a reproducible environment
 set.seed(42) 
 
@@ -76,6 +79,7 @@ for(i in 1:tests_num) {
   
   # Contains the p-value
   p_values[i] = lm_summary$coefficients["x_grade_stats", "Pr(>|t|)"]
+  rounded_p_values[i] = modified_round(p_values[i])
 }
 
 # Plot the histogram
@@ -83,30 +87,16 @@ hist(p_values,
      main = "Histogram of P values",
      xlab="P values")
 
+################################################################################
 
 # PART C (Rounding p-values down)
-# Do the same experiments but round down the observed P-value 
-for(i in 1:tests_num) {
-  x_grade_stats = rtruncnorm(sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
-  random_noise = rtruncnorm(sample_size, a=-7, b=7, mean=0, sd=2)
-  y_performance = round(7 + 0 * x_grade_stats + random_noise, digits=0)
-  
-  # Linear regression model 
-  lm_fit = lm(y_performance ~ x_grade_stats)
-  
-  # Summary of the linear regression model
-  lm_summary = summary(lm_fit)
-  
-  # Contains the p-value
-  p_values[i] = modified_round(lm_summary$coefficients["x_grade_stats", "Pr(>|t|)"])
-}
 
 # Plot the histogram
-hist(p_values,
-     main = "Histogram of rounded down P values",
+hist(rounded_p_values,
+     main = "Histogram of rounded down low P values",
      xlab="P values")
 
-
+################################################################################
 
 # PART C (Sequential testing with optional stopping)
 set.seed(201)
