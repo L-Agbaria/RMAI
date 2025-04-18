@@ -14,25 +14,24 @@ modified_round <- function(value) {
   }
 }
 
+generate_data <- function(sample_size){
+  x_grade_stats <<- rtruncnorm(sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
+  random_noise = rtruncnorm(sample_size, a=-7, b=7, mean=0, sd=2)
+  y_performance <<- round(7 + 0 * x_grade_stats + random_noise, digits=0)
+}
+
+# Desired simulated sample size
+sample_size = 237
+
 ################################################################################
 
 # PART B
-sample_size = 237
-# Number of times to repeat the experiment
-tests_num = 50000
-# P values extracted from each repetition of the experiment
-p_values = numeric(tests_num) 
-rounded_p_values = numeric(tests_num)
 # Creates a reproducible environment
 set.seed(42) 
 
-
 # Take a sample from a truncated normal distribution for explanatory variable
-x_grade_stats = rtruncnorm(sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
-# Generate the random noise from a truncated normal distribution
-random_noise = rtruncnorm(sample_size, a=-7, b=7, mean=0, sd=2)
-# Generate discrete data 
-y_performance = round(7 + 0 * x_grade_stats + random_noise, digits=0)
+generate_data(sample_size)
+
 
 # Fit the linear regression model
 lm_fit = lm(y_performance ~ x_grade_stats)
@@ -57,24 +56,25 @@ y_ticks = seq(from=0, to=14, by=1)
 axis(1, at=x_ticks)
 axis(2, at=y_ticks)
 
+
 # Add fitted regression line to scatterplot
 abline(lm_fit)
 
-lm_fit
-summary(lm_fit)
-
 
 # Run tests_num amount of repetitions and push the observed
+# Number of times to repeat the experiment
+tests_num = 10000
+
+# P values extracted from each repetition of the experiment
+p_values = numeric(tests_num) 
+rounded_p_values = numeric(tests_num)
+
 # p-values to the p_values table
 for(i in 1:tests_num) {
-  x_grade_stats = rtruncnorm(sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
-  random_noise = rtruncnorm(sample_size, a=-7, b=7, mean=0, sd=2)
-  y_performance = round(7 + 0 * x_grade_stats + random_noise, digits=0)
+  generate_data(sample_size)
   
-  # Linear regression model 
+  # Linear regression
   lm_fit = lm(y_performance ~ x_grade_stats)
-  
-  # Summary of the linear regression model
   lm_summary = summary(lm_fit)
   
   # Contains the p-value
@@ -104,11 +104,7 @@ max_sample_size = 1000
 p_values = numeric(max_sample_size)
 
 # Take a sample from a truncated normal distribution for explanatory variable
-x_grade_stats = rtruncnorm(max_sample_size, a=5.5, b=9.5, mean=6.5, sd=2)
-# Generate the random noise from a truncated normal distribution
-random_noise = rtruncnorm(max_sample_size, a=-7, b=7, mean=0, sd=2)
-# Generate the data
-y_performance = round(7 + 0 * x_grade_stats + random_noise, digits=0)
+generate_data(max_sample_size)
 
 for(sample_size in 2:max_sample_size) {
   # Consider the results of only sample_size observations
@@ -120,8 +116,7 @@ for(sample_size in 2:max_sample_size) {
   lm_summary = summary(lm_fit)
   
   # Save all the P-values for a reduced samples
-  p_value = lm_summary$coefficients["grade_stats", "Pr(>|t|)"]
-  p_values[sample_size] = p_value
+  p_values[sample_size] = lm_summary$coefficients["grade_stats", "Pr(>|t|)"]
 }
 
 # Plot the trajectory of the P-values
@@ -140,9 +135,9 @@ abline(a=0.05, b=0, col="red")
 n_when_significant = 700
 grade_stats = x_grade_stats[1:n_when_significant]
 performance = y_performance[1:n_when_significant]
-lm_fit = lm(performance ~ grade_stats)
 
 # Summary of the linear regression model
+lm_fit = lm(performance ~ grade_stats)
 lm_summary = summary(lm_fit)
 print(lm_summary$coefficients["grade_stats", "Pr(>|t|)"])
 
@@ -170,4 +165,3 @@ axis(2, at=y_ticks)
 
 # Add fitted regression line to scatterplot
 abline(lm_fit, col="red", lwd = 2)  # lwd increases line width
-
