@@ -66,7 +66,7 @@ abline(lm_fit)
 
 # Run tests_num amount of repetitions and push the observed
 # Number of times to repeat the experiment
-tests_num = 10000
+tests_num = 1000000
 
 # P values extracted from each repetition of the experiment
 p_values = numeric(tests_num) 
@@ -134,7 +134,7 @@ plot(1:max_sample_size,
 abline(a=0.05, b=0, col="red")
 
 
-# Additional plot for the first sample with significant results
+# Additional plot sample with significant results
 n_when_significant = 700
 grade_stats = x_grade_stats[1:n_when_significant]
 performance = y_performance[1:n_when_significant]
